@@ -14,6 +14,7 @@ var CopyWebpackPlugin = require('copy-webpack-plugin');
 var ENV = process.env.npm_lifecycle_event;
 var isTest = ENV === 'test' || ENV === 'test-watch';
 var isProd = ENV === 'build';
+var port = 9990;
 
 module.exports = function makeWebpackConfig() {
   /**
@@ -45,7 +46,7 @@ module.exports = function makeWebpackConfig() {
 
     // Output path from the view of the page
     // Uses webpack-dev-server in development
-    publicPath: isProd ? '/' : 'http://localhost:8080/',
+    publicPath: isProd ? '/' : 'http://localhost:'+port+'/',
 
     // Filename for entry points
     // Only adds hash in build mode
@@ -103,11 +104,11 @@ module.exports = function makeWebpackConfig() {
       // Use style-loader in development.
 
       loader: isTest ? 'null-loader' : ExtractTextPlugin.extract({
-        fallbackLoader: 'style-loader',
-        loader: [
+        fallback: 'style-loader',
+        use: [
           {loader: 'css-loader', query: {sourceMap: true}},
           {loader: 'postcss-loader'}
-        ],
+        ]
       })
     }, {
       // ASSET LOADER
@@ -217,8 +218,16 @@ module.exports = function makeWebpackConfig() {
    */
   config.devServer = {
     contentBase: './src/public',
-    stats: 'minimal'
-  };
+    historyApiFallback: true,
+        stats: {
+            modules: false,
+            cached: false,
+            colors: true,
+            chunk: false
+        },
+        host: '0.0.0.0',
+        port: port
+  }
 
   return config;
 }();
